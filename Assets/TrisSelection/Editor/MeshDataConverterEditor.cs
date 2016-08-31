@@ -8,7 +8,7 @@ using System;
 public class MeshDataConverterEditor : Editor{
 
 	#region fields
-		// Transform targetTrans;
+		Transform targetTrans;
 		MeshZone mouseOverZone;
 
 		//initialized in OnEnable
