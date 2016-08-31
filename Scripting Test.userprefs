@@ -1,0 +1,14 @@
+﻿<Properties StartupItem="Assembly-CSharp.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/TrisSelection/Editor/MeshDataConverterEditor.cs">
+    <Files>
+      <File FileName="Assets/TrisSelection/MeshDataObject.cs" Line="12" Column="2" />
+      <File FileName="Assets/TrisSelection/Editor/MeshDataConverterEditor.cs" Line="194" Column="120" />
+      <File FileName="Assets/TrisSelection/MeshDataConverterScr.cs" Line="11" Column="38" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
