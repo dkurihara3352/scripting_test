@@ -65,47 +65,47 @@ public class MeshDataConverterEditor : Editor{
 				targetTrans = targetConverter.targetTrans;
 
 			#region After target trans is assigned
-			if (targetTrans != null) {
+				if (targetTrans != null) {
 
-				#region After the target trans is properly set
-				if (targetTrans.gameObject.isStatic && targetTrans.gameObject.GetComponent<MeshFilter> () != null) {
-					
-					#region Asset Conversion
-					targetConverter.assetName = EditorGUILayout.TextField ("Asset Name", targetConverter.assetName);
+					#region After the target trans is properly set
+						if (targetTrans.gameObject.isStatic && targetTrans.gameObject.GetComponent<MeshFilter> () != null) {
+							
+							#region Asset Conversion
+								targetConverter.assetName = EditorGUILayout.TextField ("Asset Name", targetConverter.assetName);
 
-					EditorGUI.BeginDisabledGroup(String.IsNullOrEmpty(targetConverter.assetName));
-					if (GUILayout.Button ("Create MeshData")){
-						MeshDataObject namedAsset = (MeshDataObject)AssetDatabase.LoadAssetAtPath("Assets/" + targetConverter.assetName +".asset",
-							typeof(MeshDataObject));
-						if(namedAsset){
-							targetConverter.showAlreadyUsedError = true;
-						}else{
-							targetConverter.showAlreadyUsedError = false;
-							targetConverter.isAssetNameValid = true;
-							CreateMeshDataObject (targetConverter.assetName);
-						}
-					}
-					EditorGUI.EndDisabledGroup();
-					if(targetConverter.showAlreadyUsedError)EditorGUILayout.HelpBox("The asset name is already used", MessageType.Error);
+								EditorGUI.BeginDisabledGroup(String.IsNullOrEmpty(targetConverter.assetName));
+								if (GUILayout.Button ("Create MeshData")){
+									MeshDataObject namedAsset = (MeshDataObject)AssetDatabase.LoadAssetAtPath("Assets/" + targetConverter.assetName +".asset",
+										typeof(MeshDataObject));
+									if(namedAsset){
+										targetConverter.showAlreadyUsedError = true;
+									}else{
+										targetConverter.showAlreadyUsedError = false;
+										targetConverter.isAssetNameValid = true;
+										CreateMeshDataObject (targetConverter.assetName);
+									}
+								}
+								EditorGUI.EndDisabledGroup();
+								if(targetConverter.showAlreadyUsedError)EditorGUILayout.HelpBox("The asset name is already used", MessageType.Error);
+							#endregion
+
+							// #region After Asset name is correctly fed
+							// if(targetConverter.isAssetNameValid){
+							// }
+							// #endregion
+
+
+
+						} else if (!targetTrans.gameObject.isStatic)
+							EditorGUILayout.HelpBox ("Target Trans is not set static", MessageType.Error);
+						else if (targetTrans.gameObject.GetComponent<MeshFilter> () == null)
+							EditorGUILayout.HelpBox ("Target Trans does not have a mesh filter component", MessageType.Error);
 					#endregion
 
-					#region After Asset name is correctly fed
-					if(targetConverter.isAssetNameValid){
-					}
-					#endregion
 
 
-
-				} else if (!targetTrans.gameObject.isStatic)
-					EditorGUILayout.HelpBox ("Target Trans is not set static", MessageType.Error);
-				else if (targetTrans.gameObject.GetComponent<MeshFilter> () == null)
-					EditorGUILayout.HelpBox ("Target Trans does not have a mesh filter component", MessageType.Error);
-				#endregion
-
-
-
-			} else
-				EditorGUILayout.HelpBox ("No Target Trans assigned", MessageType.Error);
+				} else
+					EditorGUILayout.HelpBox ("No Target Trans assigned", MessageType.Error);
 			#endregion
 
 			//Beginning Mesh Data Editor Section
@@ -121,8 +121,7 @@ public class MeshDataConverterEditor : Editor{
 
 				serializedMDObj = new UnityEditor.SerializedObject(targetConverter.meshData);
 				serializedMDObj.Update();
-				//							targetMeshData = (MeshDataObject)serializedMDObj.targetObject;
-
+				
 				targetConverter.isReady = EditorGUILayout.Toggle ("Mesh Data ready for scene editing", targetConverter.isReady);
 
 				#region Zones
