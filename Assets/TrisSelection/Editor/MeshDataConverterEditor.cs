@@ -7,8 +7,6 @@ using System;
 [CustomEditor(typeof(MeshDataConverterScr))]
 public class MeshDataConverterEditor : Editor{
 
-//this is the master
-
 
 	#region fields
 		Transform targetTrans;
