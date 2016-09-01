@@ -7,7 +7,7 @@ using System;
 [CustomEditor(typeof(MeshDataConverterScr))]
 public class MeshDataConverterEditor : Editor{
 
-	#region fields
+	//Fields
 		Transform targetTrans;
 		MeshZone mouseOverZone;
 
@@ -24,7 +24,7 @@ public class MeshDataConverterEditor : Editor{
 			Color hoverZoneGroupFillCol;
 
 			SerializedObject serializedMDObj;
-	#endregion
+	
 
 	void OnEnable(){
 		
@@ -102,17 +102,15 @@ public class MeshDataConverterEditor : Editor{
 							EditorGUILayout.HelpBox ("Target Trans does not have a mesh filter component", MessageType.Error);
 					#endregion
 
-
-
 				} else
 					EditorGUILayout.HelpBox ("No Target Trans assigned", MessageType.Error);
 			#endregion
 
-			//Beginning Mesh Data Editor Section
+		//Beginning Mesh Data Manager Section
 			EditorGUI.indentLevel = curInd;
 
 			EditorGUILayout.Space();
-			EditorGUILayout.LabelField("Mesh Data Editor", headerStyle);
+			EditorGUILayout.LabelField("Mesh Data Manager", headerStyle);
 			EditorGUI.indentLevel ++;
 
 			targetConverter.meshData = (MeshDataObject)EditorGUILayout.ObjectField ("MeshData to edit", targetConverter.meshData, typeof(MeshDataObject), false);
@@ -125,52 +123,52 @@ public class MeshDataConverterEditor : Editor{
 				targetConverter.isReady = EditorGUILayout.Toggle ("Mesh Data ready for scene editing", targetConverter.isReady);
 
 				#region Zones
-				EditorGUILayout.Space ();
-				EditorGUILayout.LabelField ("Mesh Zones", headerStyle);
+					EditorGUILayout.Space ();
+					EditorGUILayout.LabelField ("Mesh Zones", headerStyle);
 
-				targetConverter.zonesToCreate = EditorGUILayout.IntField ("number of zones to create: ", targetConverter.zonesToCreate);
-				Undo.RecordObject (serializedObject.targetObject, "myInspector");
+					targetConverter.zonesToCreate = EditorGUILayout.IntField ("number of zones to create: ", targetConverter.zonesToCreate);
+					Undo.RecordObject (serializedObject.targetObject, "myInspector");
 
-				if (targetConverter.zonesToCreate != 0) {
-					if (GUILayout.Button ("Create Zones", GUILayout.MaxWidth (200))) {
-						CreateZones (targetConverter.zonesToCreate, targetConverter);	
-					}
-				}
-
-				#region Zone Display
-				if (targetConverter.meshData.meshZones != null && targetConverter.meshData.meshZones.Count != 0) {
-					targetConverter.showAllZones = EditorGUILayout.Foldout(targetConverter.showAllZones, 
-						"Show All " + targetConverter.meshData.meshZones.Count.ToString() +  " Zones");
-					if(targetConverter.showAllZones){
-						for (int i = 0; i < targetConverter.meshData.meshZones.Count; i++) {
-							EditorGUILayout.BeginVertical ();
-							{
-								EditorGUILayout.BeginHorizontal ();
-								{
-									targetConverter.meshData.meshZones [i].showZone = EditorGUILayout.Foldout (targetConverter.meshData.meshZones [i].showZone,
-										targetConverter.meshData.meshZones [i].zoneName);
-									targetConverter.meshData.meshZones [i].zoneColor = EditorGUILayout.ColorField (targetConverter.meshData.meshZones [i].zoneColor);
-									Undo.RecordObject (serializedObject.targetObject, "myInpector");
-									EditorGUILayout.LabelField ("Zone Tris Count: " + targetConverter.meshData.meshZones [i].zoneTris.Count.ToString ());	
-								}
-								EditorGUILayout.EndHorizontal ();
-
-								if (targetConverter.meshData.meshZones [i].showZone) {
-
-									if (targetConverter.meshData.meshZones [i].zoneTris.Count != 0) {
-
-										for (int j = 0; j < targetConverter.meshData.meshZones [i].zoneTris.Count; j++) {
-											EditorGUILayout.LabelField (targetConverter.meshData.meshZones [i].zoneTris [j].triName);
-										}
-
-									} else EditorGUILayout.HelpBox ("There's no zone tris assigned yet", MessageType.Error);
-								}
-							}EditorGUILayout.EndVertical ();
+					if (targetConverter.zonesToCreate != 0) {
+						if (GUILayout.Button ("Create Zones", GUILayout.MaxWidth (200))) {
+							CreateZones (targetConverter.zonesToCreate, targetConverter);	
 						}
 					}
-				} else EditorGUILayout.HelpBox ("There's no zones created", MessageType.Error);
-			
-				#endregion
+
+					#region Zone Display
+						if (targetConverter.meshData.meshZones != null && targetConverter.meshData.meshZones.Count != 0) {
+							targetConverter.showAllZones = EditorGUILayout.Foldout(targetConverter.showAllZones, 
+								"Show All " + targetConverter.meshData.meshZones.Count.ToString() +  " Zones");
+							if(targetConverter.showAllZones){
+								for (int i = 0; i < targetConverter.meshData.meshZones.Count; i++) {
+									EditorGUILayout.BeginVertical ();
+									{
+										EditorGUILayout.BeginHorizontal ();
+										{
+											targetConverter.meshData.meshZones [i].showZone = EditorGUILayout.Foldout (targetConverter.meshData.meshZones [i].showZone,
+												targetConverter.meshData.meshZones [i].zoneName);
+											targetConverter.meshData.meshZones [i].zoneColor = EditorGUILayout.ColorField (targetConverter.meshData.meshZones [i].zoneColor);
+											Undo.RecordObject (serializedObject.targetObject, "myInpector");
+											EditorGUILayout.LabelField ("Zone Tris Count: " + targetConverter.meshData.meshZones [i].zoneTris.Count.ToString ());	
+										}
+										EditorGUILayout.EndHorizontal ();
+
+										if (targetConverter.meshData.meshZones [i].showZone) {
+
+											if (targetConverter.meshData.meshZones [i].zoneTris.Count != 0) {
+
+												for (int j = 0; j < targetConverter.meshData.meshZones [i].zoneTris.Count; j++) {
+													EditorGUILayout.LabelField (targetConverter.meshData.meshZones [i].zoneTris [j].triName);
+												}
+
+											} else EditorGUILayout.HelpBox ("There's no zone tris assigned yet", MessageType.Error);
+										}
+									}EditorGUILayout.EndVertical ();
+								}
+							}
+						} else EditorGUILayout.HelpBox ("There's no zones created", MessageType.Error);
+				
+					#endregion
 				#endregion
 
 
@@ -178,79 +176,79 @@ public class MeshDataConverterEditor : Editor{
 				if(targetConverter.meshData.meshZones != null){
 					#region ActiveZone
 
-					EditorGUILayout.Space ();
-					EditorGUILayout.LabelField ("Active Zone", headerStyle);
+						EditorGUILayout.Space ();
+						EditorGUILayout.LabelField ("Active Zone", headerStyle);
 
-					#region Prev&Next Buttons
-					EditorGUILayout.BeginHorizontal();{
-						// prev. cur. next
-						EditorGUI.BeginDisabledGroup(targetConverter.activeZoneIndex <= 0);{
-							if(GUILayout.Button("Prev")){targetConverter.activeZoneIndex--;}
-						}EditorGUI.EndDisabledGroup();
+						#region Prev&Next Buttons
+							EditorGUILayout.BeginHorizontal();{
+								// prev. cur. next
+								EditorGUI.BeginDisabledGroup(targetConverter.activeZoneIndex <= 0);{
+									if(GUILayout.Button("Prev")){targetConverter.activeZoneIndex--;}
+								}EditorGUI.EndDisabledGroup();
 
-						targetConverter.activeZoneIndex = EditorGUILayout.IntField(targetConverter.activeZoneIndex, GUILayout.MaxWidth(50f));
-						EditorGUILayout.LabelField(" of " + targetConverter.meshData.meshZones.Count.ToString() + " Zones", GUILayout.MaxWidth(100f));
+								targetConverter.activeZoneIndex = EditorGUILayout.IntField(targetConverter.activeZoneIndex, GUILayout.MaxWidth(50f));
+								EditorGUILayout.LabelField(" of " + targetConverter.meshData.meshZones.Count.ToString() + " Zones", GUILayout.MaxWidth(100f));
 
-						EditorGUI.BeginDisabledGroup(targetConverter.activeZoneIndex >= targetConverter.meshData.meshZones.Count -1);{
-							if(GUILayout.Button("Next")){targetConverter.activeZoneIndex++;}
-						}EditorGUI.EndDisabledGroup();
+								EditorGUI.BeginDisabledGroup(targetConverter.activeZoneIndex >= targetConverter.meshData.meshZones.Count -1);{
+									if(GUILayout.Button("Next")){targetConverter.activeZoneIndex++;}
+								}EditorGUI.EndDisabledGroup();
 
-					}EditorGUILayout.EndHorizontal();
-					#endregion
+							}EditorGUILayout.EndHorizontal();
+						#endregion
 
-					if (targetConverter.toolBarStrings != null)
-						SetActiveZone (GUILayout.Toolbar (targetConverter.activeZoneIndex, targetConverter.toolBarStrings), 
-							targetConverter);
+						if (targetConverter.toolBarStrings != null)
+							SetActiveZone (GUILayout.Toolbar (targetConverter.activeZoneIndex, targetConverter.toolBarStrings), 
+								targetConverter);
 
-					if (targetConverter.activeZone != null) {
+						if (targetConverter.activeZone != null) {
 
-						EditorGUILayout.BeginVertical ();
-						{
-							EditorGUILayout.BeginHorizontal ();
+							EditorGUILayout.BeginVertical ();
 							{
-								EditorGUILayout.LabelField (targetConverter.activeZone.zoneName.ToString (), GUILayout.MaxWidth (100));
-								EditorGUILayout.ColorField (targetConverter.activeZone.zoneColor, GUILayout.MinWidth (100));
-								EditorGUILayout.LabelField ("active zone tris count: " + targetConverter.activeZone.zoneTris.Count.ToString ());
-							}
-							EditorGUILayout.EndHorizontal ();
+								EditorGUILayout.BeginHorizontal ();
+								{
+									EditorGUILayout.LabelField (targetConverter.activeZone.zoneName.ToString (), GUILayout.MaxWidth (100));
+									EditorGUILayout.ColorField (targetConverter.activeZone.zoneColor, GUILayout.MinWidth (100));
+									EditorGUILayout.LabelField ("active zone tris count: " + targetConverter.activeZone.zoneTris.Count.ToString ());
+								}
+								EditorGUILayout.EndHorizontal ();
 
-							targetConverter.showActiveZoneTris = EditorGUILayout.Foldout(targetConverter.showActiveZoneTris,
-								"Show All " + targetConverter.activeZone.zoneTris.Count + " active zone tris");
+								targetConverter.showActiveZoneTris = EditorGUILayout.Foldout(targetConverter.showActiveZoneTris,
+									"Show All " + targetConverter.activeZone.zoneTris.Count + " active zone tris");
 
-							if(targetConverter.showActiveZoneTris){
-								for (int i = 0; i < targetConverter.activeZone.zoneTris.Count; i++) {
-									EditorGUILayout.LabelField (targetConverter.activeZone.zoneTris [i].triName.ToString ());
+								if(targetConverter.showActiveZoneTris){
+									for (int i = 0; i < targetConverter.activeZone.zoneTris.Count; i++) {
+										EditorGUILayout.LabelField (targetConverter.activeZone.zoneTris [i].triName.ToString ());
+									}
 								}
 							}
-						}
-						EditorGUILayout.EndVertical ();
-					} else
-						EditorGUILayout.HelpBox ("Active Zone is not set", MessageType.Error);
+							EditorGUILayout.EndVertical ();
+						} else
+							EditorGUILayout.HelpBox ("Active Zone is not set", MessageType.Error);
 					#endregion
 
 					//Creating Adjuscent Zones
-					if (GUILayout.Button ("Create Zone Group")) {
-						CreateZoneGroup (targetConverter.meshData);
-					}
+						if (GUILayout.Button ("Create Zone Group")) {
+							CreateZoneGroup (targetConverter.meshData);
+						}
 
 					//Controls for meshData scene display
-					EditorGUILayout.BeginHorizontal ();
-					{
-						if (GUILayout.Button (targetConverter.showAllZoneTris ? "Show All Zone Tris: On" : "Show All Zones Tris: Off",
-							targetConverter.showAllZoneTris ? toggleButtonDown : toggleButtonUp)) {
-							targetConverter.showAllZoneTris = !targetConverter.showAllZoneTris;
-						}
-						if (GUILayout.Button (targetConverter.showNTB ? "Show N, T, B: On" : "Show N, T, B: Off", targetConverter.showNTB ? toggleButtonDown : toggleButtonUp)) {
-							targetConverter.showNTB = !targetConverter.showNTB;
-						}
+						EditorGUILayout.BeginHorizontal ();
+						{
+							if (GUILayout.Button (targetConverter.showAllZoneTris ? "Show All Zone Tris: On" : "Show All Zones Tris: Off",
+								targetConverter.showAllZoneTris ? toggleButtonDown : toggleButtonUp)) {
+								targetConverter.showAllZoneTris = !targetConverter.showAllZoneTris;
+							}
+							if (GUILayout.Button (targetConverter.showNTB ? "Show N, T, B: On" : "Show N, T, B: Off", targetConverter.showNTB ? toggleButtonDown : toggleButtonUp)) {
+								targetConverter.showNTB = !targetConverter.showNTB;
+							}
 
-						if (GUILayout.Button (targetConverter.showNTB ? "Show AZ Tri: On" : "Show AZ Tri: Off", 
-							targetConverter.showAZTrisOnScene ? toggleButtonDown : toggleButtonUp)) {
-							targetConverter.showAZTrisOnScene = !targetConverter.showAZTrisOnScene;
-						}
+							if (GUILayout.Button (targetConverter.showNTB ? "Show AZ Tri: On" : "Show AZ Tri: Off", 
+								targetConverter.showAZTrisOnScene ? toggleButtonDown : toggleButtonUp)) {
+								targetConverter.showAZTrisOnScene = !targetConverter.showAZTrisOnScene;
+							}
 
-					}
-					EditorGUILayout.EndHorizontal ();
+						}
+						EditorGUILayout.EndHorizontal ();
 
 				}
 				#endregion
