@@ -7,8 +7,8 @@ using System;
 [CustomEditor(typeof(MeshDataConverterScr))]
 public class MeshDataConverterEditor : Editor{
 
-//this is master
 //no,this is new Branch
+//newBranch is modified once
 
 	#region fields
 		Transform targetTrans;
