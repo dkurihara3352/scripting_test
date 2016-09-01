@@ -10,6 +10,7 @@ public class MeshDataConverterEditor : Editor{
 	//Fields
 		Transform targetTrans;
 		MeshZone mouseOverZone;
+		MeshDataConverterScr targetConverter;
 
 		//initialized in OnEnable
 			SerializedProperty transProp;
@@ -53,7 +54,7 @@ public class MeshDataConverterEditor : Editor{
 
 		EditorGUI.BeginChangeCheck();{
 			
-			MeshDataConverterScr targetConverter = (MeshDataConverterScr)serializedObject.targetObject;
+			targetConverter = (MeshDataConverterScr)serializedObject.targetObject;
 
 			//Beginning Converter Section
 				EditorGUILayout.Space();
@@ -112,53 +113,65 @@ public class MeshDataConverterEditor : Editor{
 			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("Mesh Data Manager", headerStyle);
 			EditorGUI.indentLevel ++;
+			
+			//MeshDataManager Section
 
-			targetConverter.meshData = (MeshDataObject)EditorGUILayout.ObjectField ("MeshData to edit", targetConverter.meshData, typeof(MeshDataObject), false);
+			targetConverter.numOfMeshData = EditorGUILayout.IntField("MeshData size",targetConverter.numOfMeshData);
+			if(GUILayout.Button("Create Mesh Data Manager")) CreateMeshDataManagers(targetConverter.numOfMeshData);
+
+			if(targetConverter.meshDataManagers != null && targetConverter.meshDataManagers.Length != 0){
+
+				targetConverter.activeMDMIndex = GUILayout.Toolbar(targetConverter.activeMDMIndex, targetConverter.MDMstrings);
+				targetConverter.activeMDM = targetConverter.meshDataManagers[targetConverter.activeMDMIndex];
+
+				targetConverter.activeMDM.meshData = (MeshDataObject)EditorGUILayout.ObjectField("Mesh Data to Edit",targetConverter.activeMDM.meshData, typeof(MeshDataObject), false);
+			}
+			
 			#region After Mesh Data is assigned
-			if (targetConverter.meshData != null) {
+			if (targetConverter.activeMDM.meshData != null) {
 
-				serializedMDObj = new UnityEditor.SerializedObject(targetConverter.meshData);
+				serializedMDObj = new UnityEditor.SerializedObject(targetConverter.activeMDM.meshData);
 				serializedMDObj.Update();
 				
-				targetConverter.isReady = EditorGUILayout.Toggle ("Mesh Data ready for scene editing", targetConverter.isReady);
+				targetConverter.activeMDM.isReady = EditorGUILayout.Toggle ("Mesh Data ready for scene editing", targetConverter.activeMDM.isReady);
 
 				#region Zones
 					EditorGUILayout.Space ();
 					EditorGUILayout.LabelField ("Mesh Zones", headerStyle);
 
-					targetConverter.zonesToCreate = EditorGUILayout.IntField ("number of zones to create: ", targetConverter.zonesToCreate);
+					targetConverter.activeMDM.zonesToCreate = EditorGUILayout.IntField ("number of zones to create: ", targetConverter.activeMDM.zonesToCreate);
 					Undo.RecordObject (serializedObject.targetObject, "myInspector");
 
-					if (targetConverter.zonesToCreate != 0) {
+					if (targetConverter.activeMDM.zonesToCreate != 0) {
 						if (GUILayout.Button ("Create Zones", GUILayout.MaxWidth (200))) {
-							CreateZones (targetConverter.zonesToCreate, targetConverter);	
+							CreateZones (targetConverter.activeMDM.zonesToCreate);	
 						}
 					}
 
 					#region Zone Display
-						if (targetConverter.meshData.meshZones != null && targetConverter.meshData.meshZones.Count != 0) {
+						if (targetConverter.activeMDM.meshData.meshZones != null && targetConverter.activeMDM.meshData.meshZones.Count != 0) {
 							targetConverter.showAllZones = EditorGUILayout.Foldout(targetConverter.showAllZones, 
-								"Show All " + targetConverter.meshData.meshZones.Count.ToString() +  " Zones");
+								"Show All " + targetConverter.activeMDM.meshData.meshZones.Count.ToString() +  " Zones");
 							if(targetConverter.showAllZones){
-								for (int i = 0; i < targetConverter.meshData.meshZones.Count; i++) {
+								for (int i = 0; i < targetConverter.activeMDM.meshData.meshZones.Count; i++) {
 									EditorGUILayout.BeginVertical ();
 									{
 										EditorGUILayout.BeginHorizontal ();
 										{
-											targetConverter.meshData.meshZones [i].showZone = EditorGUILayout.Foldout (targetConverter.meshData.meshZones [i].showZone,
-												targetConverter.meshData.meshZones [i].zoneName);
-											targetConverter.meshData.meshZones [i].zoneColor = EditorGUILayout.ColorField (targetConverter.meshData.meshZones [i].zoneColor);
+											targetConverter.activeMDM.meshData.meshZones [i].showZone = EditorGUILayout.Foldout (targetConverter.activeMDM.meshData.meshZones [i].showZone,
+												targetConverter.activeMDM.meshData.meshZones [i].zoneName);
+											targetConverter.activeMDM.meshData.meshZones [i].zoneColor = EditorGUILayout.ColorField (targetConverter.activeMDM.meshData.meshZones [i].zoneColor);
 											Undo.RecordObject (serializedObject.targetObject, "myInpector");
-											EditorGUILayout.LabelField ("Zone Tris Count: " + targetConverter.meshData.meshZones [i].zoneTris.Count.ToString ());	
+											EditorGUILayout.LabelField ("Zone Tris Count: " + targetConverter.activeMDM.meshData.meshZones [i].zoneTris.Count.ToString ());	
 										}
 										EditorGUILayout.EndHorizontal ();
 
-										if (targetConverter.meshData.meshZones [i].showZone) {
+										if (targetConverter.activeMDM.meshData.meshZones [i].showZone) {
 
-											if (targetConverter.meshData.meshZones [i].zoneTris.Count != 0) {
+											if (targetConverter.activeMDM.meshData.meshZones [i].zoneTris.Count != 0) {
 
-												for (int j = 0; j < targetConverter.meshData.meshZones [i].zoneTris.Count; j++) {
-													EditorGUILayout.LabelField (targetConverter.meshData.meshZones [i].zoneTris [j].triName);
+												for (int j = 0; j < targetConverter.activeMDM.meshData.meshZones [i].zoneTris.Count; j++) {
+													EditorGUILayout.LabelField (targetConverter.activeMDM.meshData.meshZones [i].zoneTris [j].triName);
 												}
 
 											} else EditorGUILayout.HelpBox ("There's no zone tris assigned yet", MessageType.Error);
@@ -173,7 +186,7 @@ public class MeshDataConverterEditor : Editor{
 
 
 				#region After mesh zones are correctly set
-				if(targetConverter.meshData.meshZones != null){
+				if(targetConverter.activeMDM.meshData.meshZones != null){
 					#region ActiveZone
 
 						EditorGUILayout.Space ();
@@ -182,42 +195,41 @@ public class MeshDataConverterEditor : Editor{
 						#region Prev&Next Buttons
 							EditorGUILayout.BeginHorizontal();{
 								// prev. cur. next
-								EditorGUI.BeginDisabledGroup(targetConverter.activeZoneIndex <= 0);{
-									if(GUILayout.Button("Prev")){targetConverter.activeZoneIndex--;}
+								EditorGUI.BeginDisabledGroup(targetConverter.activeMDM.activeZoneIndex <= 0);{
+									if(GUILayout.Button("Prev")){targetConverter.activeMDM.activeZoneIndex--;}
 								}EditorGUI.EndDisabledGroup();
 
-								targetConverter.activeZoneIndex = EditorGUILayout.IntField(targetConverter.activeZoneIndex, GUILayout.MaxWidth(50f));
-								EditorGUILayout.LabelField(" of " + targetConverter.meshData.meshZones.Count.ToString() + " Zones", GUILayout.MaxWidth(100f));
+								targetConverter.activeMDM.activeZoneIndex = EditorGUILayout.IntField(targetConverter.activeMDM.activeZoneIndex, GUILayout.MaxWidth(50f));
+								EditorGUILayout.LabelField(" of " + targetConverter.activeMDM.meshData.meshZones.Count.ToString() + " Zones", GUILayout.MaxWidth(100f));
 
-								EditorGUI.BeginDisabledGroup(targetConverter.activeZoneIndex >= targetConverter.meshData.meshZones.Count -1);{
-									if(GUILayout.Button("Next")){targetConverter.activeZoneIndex++;}
+								EditorGUI.BeginDisabledGroup(targetConverter.activeMDM.activeZoneIndex >= targetConverter.activeMDM.meshData.meshZones.Count -1);{
+									if(GUILayout.Button("Next")){targetConverter.activeMDM.activeZoneIndex++;}
 								}EditorGUI.EndDisabledGroup();
 
 							}EditorGUILayout.EndHorizontal();
 						#endregion
 
-						if (targetConverter.toolBarStrings != null)
-							SetActiveZone (GUILayout.Toolbar (targetConverter.activeZoneIndex, targetConverter.toolBarStrings), 
-								targetConverter);
+						if (targetConverter.activeMDM.toolBarStrings != null)
+							SetActiveZone (GUILayout.Toolbar (targetConverter.activeMDM.activeZoneIndex, targetConverter.activeMDM.toolBarStrings));
 
-						if (targetConverter.activeZone != null) {
+						if (targetConverter.activeMDM.activeZone != null) {
 
 							EditorGUILayout.BeginVertical ();
 							{
 								EditorGUILayout.BeginHorizontal ();
 								{
-									EditorGUILayout.LabelField (targetConverter.activeZone.zoneName.ToString (), GUILayout.MaxWidth (100));
-									EditorGUILayout.ColorField (targetConverter.activeZone.zoneColor, GUILayout.MinWidth (100));
-									EditorGUILayout.LabelField ("active zone tris count: " + targetConverter.activeZone.zoneTris.Count.ToString ());
+									EditorGUILayout.LabelField (targetConverter.activeMDM.activeZone.zoneName.ToString (), GUILayout.MaxWidth (100));
+									EditorGUILayout.ColorField (targetConverter.activeMDM.activeZone.zoneColor, GUILayout.MinWidth (100));
+									EditorGUILayout.LabelField ("active zone tris count: " + targetConverter.activeMDM.activeZone.zoneTris.Count.ToString ());
 								}
 								EditorGUILayout.EndHorizontal ();
 
 								targetConverter.showActiveZoneTris = EditorGUILayout.Foldout(targetConverter.showActiveZoneTris,
-									"Show All " + targetConverter.activeZone.zoneTris.Count + " active zone tris");
+									"Show All " + targetConverter.activeMDM.activeZone.zoneTris.Count + " active zone tris");
 
 								if(targetConverter.showActiveZoneTris){
-									for (int i = 0; i < targetConverter.activeZone.zoneTris.Count; i++) {
-										EditorGUILayout.LabelField (targetConverter.activeZone.zoneTris [i].triName.ToString ());
+									for (int i = 0; i < targetConverter.activeMDM.activeZone.zoneTris.Count; i++) {
+										EditorGUILayout.LabelField (targetConverter.activeMDM.activeZone.zoneTris [i].triName.ToString ());
 									}
 								}
 							}
@@ -228,7 +240,7 @@ public class MeshDataConverterEditor : Editor{
 
 					//Creating Adjuscent Zones
 						if (GUILayout.Button ("Create Zone Group")) {
-							CreateZoneGroup (targetConverter.meshData);
+							CreateZoneGroup (targetConverter.activeMDM.meshData);
 						}
 
 					//Controls for meshData scene display
@@ -274,13 +286,13 @@ public class MeshDataConverterEditor : Editor{
 		
 			Event curEv = Event.current; 
 			MeshDataConverterScr targetConverter = (MeshDataConverterScr)serializedObject.targetObject;
-			MeshDataObject targetMeshData = targetConverter.meshData;
+			MeshDataObject targetMeshData = targetConverter.activeMDM.meshData;
 			int controlID = GUIUtility.GetControlID(FocusType.Passive);
 			Camera curCam = Camera.current;
 			if(targetMeshData == null)return;
 
 
-			if(targetConverter.isReady){
+			if(targetConverter.activeMDM.isReady){
 				CoupledTri mouseOverTri = GetMouseOverTri(targetMeshData.coupledTris, curEv, curCam);
 				if(targetMeshData.meshZones.Count != 0)
 					mouseOverZone = GetMouseOverZone(mouseOverTri, targetMeshData.meshZones);
@@ -300,15 +312,15 @@ public class MeshDataConverterEditor : Editor{
 				case EventType.MouseDrag:
 					GUIUtility.hotControl = controlID;
 					if(curEv.modifiers == EventModifiers.Shift){
-						if(targetConverter.activeZone.zoneTris.Contains(mouseOverTri))
-							targetConverter.activeZone.zoneTris.Remove(mouseOverTri);
+						if(targetConverter.activeMDM.activeZone.zoneTris.Contains(mouseOverTri))
+							targetConverter.activeMDM.activeZone.zoneTris.Remove(mouseOverTri);
 							curEv.Use();
 							break;
 					}
 					if(curEv.modifiers == EventModifiers.Control){
-						if(!targetConverter.activeZone.zoneTris.Contains(mouseOverTri) || targetConverter.activeZone.zoneTris.Count == 0){
+						if(!targetConverter.activeMDM.activeZone.zoneTris.Contains(mouseOverTri) || targetConverter.activeMDM.activeZone.zoneTris.Count == 0){
 							if(mouseOverTri.triName!= "ng")
-								targetConverter.activeZone.zoneTris.Add(mouseOverTri);
+								targetConverter.activeMDM.activeZone.zoneTris.Add(mouseOverTri);
 						}
 					}
 
@@ -414,12 +426,12 @@ public class MeshDataConverterEditor : Editor{
 
 				#region Draw Active Zone Tris
 				if (targetConverter.showAZTrisOnScene) {
-					Handles.color = targetConverter.activeZone.zoneColor;
-					for (int i = 0; i < targetConverter.activeZone.zoneTris.Count; i++) {
+					Handles.color = targetConverter.activeMDM.activeZone.zoneColor;
+					for (int i = 0; i < targetConverter.activeMDM.activeZone.zoneTris.Count; i++) {
 						Handles.DrawAAConvexPolygon (
-							targetConverter.activeZone.zoneTris [i].p0,
-							targetConverter.activeZone.zoneTris [i].p1,
-							targetConverter.activeZone.zoneTris [i].p2);
+							targetConverter.activeMDM.activeZone.zoneTris [i].p0,
+							targetConverter.activeMDM.activeZone.zoneTris [i].p1,
+							targetConverter.activeMDM.activeZone.zoneTris [i].p2);
 					}
 				}
 				#endregion
@@ -601,26 +613,26 @@ public class MeshDataConverterEditor : Editor{
 		return null;
 	}
 
-	void CreateZones(int num, MeshDataConverterScr converter){
+	void CreateZones(int num){
 		
-		converter.meshData.meshZones = new List<MeshZone>();
+		targetConverter.activeMDM.meshData.meshZones = new List<MeshZone>();
 		MeshZone.zonesSize = 0;
-		converter.toolBarStrings = new string[num];
-		converter.meshData.zoneGroup.Clear();
+		targetConverter.activeMDM.toolBarStrings = new string[num];
+		targetConverter.activeMDM.meshData.zoneGroup.Clear();
 		for(int i = 0; i < num; i++){
 			MeshZoneList newMeshZoneList = new MeshZoneList();
 			newMeshZoneList.childMeshZones = new List<MeshZone>();
-			converter.meshData.zoneGroup.Add(newMeshZoneList);
+			targetConverter.activeMDM.meshData.zoneGroup.Add(newMeshZoneList);
 			MeshZone newMeshZone = new MeshZone();
-			converter.meshData.meshZones.Add(newMeshZone);
-			converter.toolBarStrings[i] = i.ToString();
+			targetConverter.activeMDM.meshData.meshZones.Add(newMeshZone);
+			targetConverter.activeMDM.toolBarStrings[i] = i.ToString();
 		}
 	}
 		
-	void SetActiveZone(int index, MeshDataConverterScr converterScr){
-		if(converterScr.meshData.meshZones.Count != 0 && converterScr.activeZoneIndex!= -1){
-			converterScr.activeZone = converterScr.meshData.meshZones[index];
-			converterScr.activeZoneIndex = index;
+	void SetActiveZone(int index){
+		if(targetConverter.activeMDM.meshData.meshZones.Count != 0 && targetConverter.activeMDM.activeZoneIndex!= -1){
+			targetConverter.activeMDM.activeZone = targetConverter.activeMDM.meshData.meshZones[index];
+			targetConverter.activeMDM.activeZoneIndex = index;
 		}else return;
 	}
 
@@ -635,6 +647,22 @@ public class MeshDataConverterEditor : Editor{
 
 	List<MeshZone> GetMemberZone(MeshZone zone, MeshDataObject dataObj){
 		return dataObj.zoneGroup[zone.index].childMeshZones;
+	}
+
+	void CreateMeshDataManagers(int num){
+		
+		MeshDataManager[] newMDMArray = new MeshDataManager[num];
+		string[] newStrings = new string[num];
+		for (int i = 0; i < num; i++)
+		{
+			MeshDataManager newManager = new MeshDataManager();
+			newMDMArray[i] = newManager;
+			string newStr = i.ToString();
+			newStrings[i] = newStr;
+
+		}
+		targetConverter.meshDataManagers = newMDMArray;
+		targetConverter.MDMstrings = newStrings;
 	}
 }
 

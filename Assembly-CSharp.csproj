@@ -106,6 +106,7 @@
      <Compile Include="Assets\TrisSelection\FreeMove.cs" />
      <Compile Include="Assets\TrisSelection\MeshDataClass.cs" />
      <Compile Include="Assets\TrisSelection\MeshDataConverterScr.cs" />
+     <Compile Include="Assets\TrisSelection\MeshDataManager.cs" />
      <Compile Include="Assets\TrisSelection\MeshDataObject.cs" />
      <Compile Include="Assets\TrisSelection\TrisHolder.cs" />
      <Compile Include="Assets\TrisSelection\trial.cs" />
