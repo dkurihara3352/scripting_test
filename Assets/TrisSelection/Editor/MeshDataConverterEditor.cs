@@ -7,7 +7,6 @@ using System;
 [CustomEditor(typeof(MeshDataConverterScr))]
 public class MeshDataConverterEditor : Editor{
 
-
 	#region fields
 		Transform targetTrans;
 		MeshZone mouseOverZone;
